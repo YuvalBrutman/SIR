@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-d_t = 0.1
+d_t = 60
 S, I, R = 0, 1, 2
 starting_N = 7.8e9
 
