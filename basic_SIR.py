@@ -6,12 +6,11 @@ starting_N = 7.8e9
 def f(SIR, beta, N, gama):
     return np.array([(-beta/N)*SIR[I]*SIR[S], -gama*SIR[I]+(beta/N)*SIR[I]*SIR[S], gama*SIR[I]])
 
-def run_simulation(d_t, SIR , N , gama = 1/4, beta = 1/2):
+def run_simulation(d_t, SIR , N , gama=(1 / 4)/(24*3600), beta=(1 / 2)/(24*3600)):
     S_array, I_array, R_array , time = [], [], [], []
     t = 0
     cur_SIR = SIR
     while cur_SIR[I] >= 1:
-        print(cur_SIR[I])
         k_1 = d_t*f(cur_SIR,beta,N,gama)
         k_2 = d_t*f(cur_SIR+k_1/2,beta,N,gama)
         k_3 = d_t*f(cur_SIR+k_2/2,beta,N,gama)
