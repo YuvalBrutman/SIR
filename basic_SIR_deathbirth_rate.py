@@ -11,7 +11,11 @@ def run_simulation(d_t, SIR , N , gama = 1/4, beta = 1/2):
     t = 0
     cur_SIR = SIR
     while cur_SIR[I] >= 1:
-        print(cur_SIR[I])
+        if t%60 == 0:
+            N += 36
+            SIR[S] += 190
+            SIR[I] -= 77
+            SIR[R] -= 77
         k_1 = d_t*f(cur_SIR,beta,N,gama)
         k_2 = d_t*f(cur_SIR+k_1/2,beta,N,gama)
         k_3 = d_t*f(cur_SIR+k_2/2,beta,N,gama)
@@ -28,4 +32,4 @@ def run_simulation(d_t, SIR , N , gama = 1/4, beta = 1/2):
     plt.plot(np.array(time),np.array(R_array), label = "R")
     plt.legend()
     plt.show()
-run_simulation(d_t, np.array([starting_N - 10, 10, 0]), starting_N)
+run_simulation(d_t, np.array([starting_N - 1000, 1000, 0]), starting_N)
