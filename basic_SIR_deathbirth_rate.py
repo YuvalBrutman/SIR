@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # simulation constants
 DT = 60  # timestep of sim in seconds
-starting_N = 7.8e9
+starting_N = 7.8e6
 death_rate_per_second = 231 / 60
 birth_rate_per_second = 267 / 60
 sick_death_rate_ratio = 0.01
@@ -75,6 +75,7 @@ def run_simulation():
     plt.plot(np.array(time), np.array(S_array), label="S")
     plt.plot(np.array(time), np.array(I_array), label="I")
     plt.plot(np.array(time), np.array(R_array), label="R")
+    plt.plot(np.array(time), np.array(M_array), label="M")
     plt.legend()
     plt.show()
 
