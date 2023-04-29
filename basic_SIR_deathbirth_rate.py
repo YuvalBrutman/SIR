@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 # simulation constants
 DT = 60  # timestep of sim in seconds
 starting_N = 7.8e9
-death_rate_per_minute_ratio = 231 / 7.8e9
-birth_rate_per_minute_ratio = 267 / 7.8e9
+death_rate_per_second = 231 / 60
+birth_rate_per_second = 267 / 60
 sick_death_rate_ratio = 0.01
 
-GAMMA = 1 / 4 / 24 / 3600  # recovery rate (1 / s)
+GAMMA = 1 / 8 / 24 / 3600  # recovery rate (1 / s)
 BETA = 1 / 2 / 24 / 3600  # infection rate (1 / s)
 
 # miscellaneous
@@ -20,9 +20,9 @@ derivative of SIR calculator for rk4 progression
 
 
 def f(SIR, N):
-    return np.array([(-BETA / N) * SIR[I] * SIR[S],
-                     -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S],
-                     GAMMA * SIR[I]])
+    return np.array([(-BETA / N) * SIR[I] * SIR[S] + birth_rate_per_second - death_rate_per_second / 3,
+                     -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S] - death_rate_per_second / 3,
+                     GAMMA * SIR[I] - death_rate_per_second / 3])
 
 
 def rk4(SIR, N):
@@ -36,20 +36,15 @@ def rk4(SIR, N):
 
 def run_simulation():
     N = starting_N
-    SIR = np.array([N - 1000, 1000, 0])
+    SIR = np.array([N - 1000000, 1000000, 0])
     S_array, I_array, R_array, time = [], [], [], []
     t = 0
     step_count = 0
     cur_SIR = SIR
 
     while cur_SIR[I] >= 1:
-        if step_count % (60 // DT) == 0:
-            N += (-int(death_rate_per_minute_ratio * N) + int(birth_rate_per_minute_ratio * N) - int(sick_death_rate_ratio * SIR[I]))
-            SIR[S] += int(-death_rate_per_minute_ratio * N / 3 + birth_rate_per_minute_ratio * N)
-            SIR[I] += (-int(death_rate_per_minute_ratio * N / 3) - int(sick_death_rate_ratio * SIR[I]))
-            SIR[R] += (-int(death_rate_per_minute_ratio * N / 3))
-
         cur_SIR = rk4(cur_SIR, N)
+        N += (birth_rate_per_second - death_rate_per_second) * DT
 
         S_array.append(cur_SIR[S])
         I_array.append(cur_SIR[I])
