@@ -19,10 +19,19 @@ derivative of SIR calculator for rk4 progression
 """
 
 
-def f(SIR, BETA, N, GAMMA):
+def f(SIR, N):
     return np.array([(-BETA / N) * SIR[I] * SIR[S],
                      -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S],
                      GAMMA * SIR[I]])
+
+
+def rk4(SIR, N):
+    k_1 = DT * f(SIR, N)
+    k_2 = DT * f(SIR + k_1 / 2, N)
+    k_3 = DT * f(SIR + k_2 / 2, N)
+    k_4 = DT * f(SIR + k_3, N)
+
+    return SIR + (1 / 6) * (k_1 + 2 * k_2 + 2 * k_3 + k_4)
 
 
 def run_simulation():
@@ -40,13 +49,7 @@ def run_simulation():
             SIR[I] += (-int(death_rate_per_minute_ratio * N / 3) - int(sick_death_rate_ratio * SIR[I]))
             SIR[R] += (-int(death_rate_per_minute_ratio * N / 3))
 
-        k_1 = DT * f(cur_SIR, BETA, N, GAMMA)
-        k_2 = DT * f(cur_SIR + k_1 / 2, BETA, N, GAMMA)
-        k_3 = DT * f(cur_SIR + k_2 / 2, BETA, N, GAMMA)
-        k_4 = DT * f(cur_SIR + k_3, BETA, N, GAMMA)
-
-        next_SIR = cur_SIR + (1 / 6) * (k_1 + 2 * k_2 + 2 * k_3 + k_4)
-        cur_SIR = next_SIR
+        cur_SIR = rk4(cur_SIR, N)
 
         S_array.append(cur_SIR[S])
         I_array.append(cur_SIR[I])
@@ -55,7 +58,6 @@ def run_simulation():
 
         t += DT
         step_count += 1
-
 
     plt.plot(np.array(time), np.array(S_array), label="S")
     plt.plot(np.array(time), np.array(I_array), label="I")
