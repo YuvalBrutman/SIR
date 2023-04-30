@@ -22,13 +22,19 @@ derivative of SIR calculator for rk4 progression
 
 
 def f(SIR, N, vaccinate, V_array):
-    if vaccinate and len(V_array) > vaccine_effect_time // DT:
+    if vaccinate:
         vacc_to_be_immune = (V_array[-vaccine_effect_time // DT] - V_array[-vaccine_effect_time // DT - 1]) / DT
-        return np.array([(-BETA / N) * SIR[I] * SIR[S] + birth_rate_per_second - death_rate_per_second / 3 - vaccination_rate,
-                         -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S] - death_rate_per_second / 3,
-                         GAMMA * SIR[I] - death_rate_per_second / 3,
-                         vaccination_rate - vacc_to_be_immune,
-                         vacc_to_be_immune])
+        d = np.array([(-BETA / N) * SIR[I] * SIR[
+            S] + birth_rate_per_second - death_rate_per_second / 3 - vaccination_rate,
+                 -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[
+                     S] - death_rate_per_second / 3,
+                 GAMMA * SIR[I] - death_rate_per_second / 3,
+                 vaccination_rate - vacc_to_be_immune,
+                 vacc_to_be_immune])
+
+        if len(V_array) > vaccine_effect_time // DT:
+
+        return n
     else:
         return np.array([(-BETA / N) * SIR[I] * SIR[S] + birth_rate_per_second - death_rate_per_second / 3,
                          -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S] - death_rate_per_second / 3,
