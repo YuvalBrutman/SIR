@@ -23,22 +23,21 @@ derivative of SIR calculator for rk4 progression
 
 def f(SIR, N, vaccinate, V_array):
     if vaccinate:
-        vacc_to_be_immune = (V_array[-vaccine_effect_time // DT] - V_array[-vaccine_effect_time // DT - 1]) / DT
-        d = np.array([(-BETA / N) * SIR[I] * SIR[
-            S] + birth_rate_per_second - death_rate_per_second / 3 - vaccination_rate,
-                 -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[
-                     S] - death_rate_per_second / 3,
-                 GAMMA * SIR[I] - death_rate_per_second / 3,
-                 vaccination_rate - vacc_to_be_immune,
-                 vacc_to_be_immune])
+        d = np.array([(-BETA / N) * SIR[I] * SIR[S] + birth_rate_per_second - death_rate_per_second / N * SIR[S] - vaccination_rate,
+                      -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S] + (BETA / N) * SIR[I] * SIR[V] - death_rate_per_second / N * SIR[I],
+                      GAMMA * SIR[I] - death_rate_per_second / N * SIR[R],
+                      vaccination_rate - death_rate_per_second / N * SIR[V] - BETA / N * SIR[I] * SIR[V],
+                      -death_rate_per_second / N * SIR[M]])
 
         if len(V_array) > vaccine_effect_time // DT:
+            d[M] += vaccination_rate - death_rate_per_second / N * V_array[-vaccine_effect_time // DT] - BETA / N * SIR[I] * V_array[-vaccine_effect_time // DT]
+            d[V] -= vaccination_rate - death_rate_per_second / N * V_array[-vaccine_effect_time // DT] - BETA / N * SIR[I] * V_array[-vaccine_effect_time // DT]
 
-        return n
+        return d
     else:
-        return np.array([(-BETA / N) * SIR[I] * SIR[S] + birth_rate_per_second - death_rate_per_second / 3,
-                         -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S] - death_rate_per_second / 3,
-                         GAMMA * SIR[I] - death_rate_per_second / 3,
+        return np.array([(-BETA / N) * SIR[I] * SIR[S] + birth_rate_per_second - death_rate_per_second / N * SIR[S],
+                         -GAMMA * SIR[I] + (BETA / N) * SIR[I] * SIR[S] - death_rate_per_second / N * SIR[I],
+                         GAMMA * SIR[I] - death_rate_per_second / N * SIR[R],
                          0,
                          0])
 
@@ -61,7 +60,7 @@ def run_simulation():
     step_count = 0
     cur_SIRVM = SIRVM
 
-    while cur_SIRVM[I] >= 1:
+    while cur_SIRVM[I] >= 1 and t < 1e7:
         if cur_SIRVM[I] > 1000:
             vaccinate = True
 
@@ -81,6 +80,7 @@ def run_simulation():
     plt.plot(np.array(time), np.array(S_array), label="S")
     plt.plot(np.array(time), np.array(I_array), label="I")
     plt.plot(np.array(time), np.array(R_array), label="R")
+    plt.plot(np.array(time), np.array(V_array), label="V")
     plt.plot(np.array(time), np.array(M_array), label="M")
     plt.legend()
     plt.show()
